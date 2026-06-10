@@ -2,9 +2,9 @@
 
 ## Información del Estudiante
 
-- **Nombre:** [Tu nombre completo aquí]
-- **Carrera:** [Tu carrera]
-- **Fecha de inicio:** [Fecha]
+- **Nombre:** Carlos Alejandro Tene Mora
+- **Carrera:** Ingeniería de Software
+- **Fecha de inicio:** 10/06/2026
 
 ---
 
