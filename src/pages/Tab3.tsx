@@ -1,7 +1,25 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent,useIonViewWillEnter, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Tab3.css';
+import React from 'react';
+import { GithubUser } from '../interfaces/GithubUser';
+import { getUserInfo } from '../services/GithubService';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Tab3: React.FC = () => {
+  const [userInfo, setUserInfo] = React.useState<GithubUser | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  const laodUserInfo = async () => {
+    setLoading(true);
+    const userData = await getUserInfo();
+    setUserInfo(userData);
+    setLoading(false);
+  }
+
+  useIonViewWillEnter(() => {
+    laodUserInfo();
+  }, []);
+
   return (
     <IonPage>
       <IonHeader>
@@ -17,19 +35,17 @@ const Tab3: React.FC = () => {
         </IonHeader>
         <div className="card-container">
           <IonCard className="card">
-            <img alt="Avatar"  src="https://avatars.githubusercontent.com/u/235896503?v=4"/>
+            <img alt={userInfo?.name}  src={userInfo?.avatar_url} />
             <IonCardHeader>
-              <IonCardTitle>Carlos Alejandro Tene Mora</IonCardTitle>
-              <IonCardSubtitle>CarlosTene2006</IonCardSubtitle>
+              <IonCardTitle>{userInfo?.name}</IonCardTitle>
+              <IonCardSubtitle>{userInfo?.login}</IonCardSubtitle>
             </IonCardHeader>
             <IonCardContent>
-              <p>Desarrollador de software apasionado por la tecnología y el 
-                aprendizaje continuo. Con experiencia en desarrollo web y móvil, 
-                siempre buscando nuevas formas de mejorar mis habilidades y contribuir 
-                a proyectos innovadores.</p>
+              <p>{userInfo?.bio}</p>
             </IonCardContent>
           </IonCard>
         </div>
+        <LoadingSpinner isOpen={loading} />
       </IonContent>
     </IonPage>
   );

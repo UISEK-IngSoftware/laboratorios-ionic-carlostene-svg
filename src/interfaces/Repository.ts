@@ -8,3 +8,4 @@ export interface Repository {
     avatar_url: string;
   };
 }
+
