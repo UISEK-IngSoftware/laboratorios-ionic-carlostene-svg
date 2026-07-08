@@ -3,11 +3,11 @@ import './Tab1.css';
 import RepoItem from '../components/RepoItem';
 import React from 'react';
 import { Repository } from '../interfaces/Repository';
-import { fetchRepositories } from '../services/GithubService';
+import { deleteRepository, fetchRepositories } from '../services/GithubService';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Tab1: React.FC = () => {
-  const [repos,setRepos]= React.useState<Repository[]>([]);
+  const [repos, setRepos] = React.useState<Repository[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState("");
 
@@ -15,15 +15,33 @@ const Tab1: React.FC = () => {
     setLoading(true);
     fetchRepositories()
       .then((reposData) => setRepos(reposData))
-      .catch((error) => setErrorMsg(error.message))
+      .catch((error: unknown) => {
+        if (error instanceof Error) {
+          setErrorMsg(error.message);
+        } else {
+          setErrorMsg("Error desconocido");
+        }
+      })
       .finally(() => setLoading(false));
+  };
+
+  const handleDeleteRepo = async (repo: Repository) => {
+    setErrorMsg("");
+    try {
+      await deleteRepository(repo.owner.login, repo.name);
+      setRepos((prev) => prev.filter((r) => r.id !== repo.id));
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setErrorMsg(error.message);
+      } else {
+        setErrorMsg("Error desconocido");
+      }
+    }
   };
 
   useIonViewDidEnter(() => {
     loadRepositories();
   });
-
-
 
   return (
     <IonPage>
@@ -42,11 +60,11 @@ const Tab1: React.FC = () => {
         {!loading && repos.length > 0 && (
           <IonList>
             {repos.map((repo) => (
-             <RepoItem key={repo.id} {...repo}/>
+              <RepoItem key={repo.id} repository={repo} onDelete={handleDeleteRepo} />
             ))}
           </IonList>
         )}
-        
+
         <LoadingSpinner isOpen={loading} />
         {errorMsg !== "" && <IonText color="danger">{errorMsg}</IonText>}
       </IonContent>
